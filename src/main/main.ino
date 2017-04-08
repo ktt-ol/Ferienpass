@@ -1,5 +1,7 @@
 #include <Adafruit_BME280.h> // Adafruit_BME280_Library (1.0.5) [modified for I2C!], Adafruit_Unified_Sensor (1.0.2)
 #include "sensors.h"
+#include "ESP8266WiFi.h"
+
 /*
 #define BME_SCK 14;  // Serial Clock (SCK)
 #define BME_MISO 12; // Serial Data Out (SDO)
@@ -30,8 +32,32 @@ void blinkLed() {
 
 void loop() {
 	blinkLed();
+
+	// LDR
+	float ldr = sensor.getBrightness(LDR_Pin);
+	Serial.print("LDR-Brightness: "+ (String)ldr +" !\n");
+
+	// WLAN
+	int n = WiFi.scanNetworks();
+	Serial.print("Found  "+ (String)n +" WLAN-Networks!\n");
+
+	for (int i = 0; i < n; ++i) {
+		if(i % 5 == 0) { // Displaysize?
+			delay(5000);
+		}
+		Serial.print(i + 1);
+		Serial.print(": ");
+		Serial.print((WiFi.encryptionType(i) == ENC_TYPE_NONE)?" ":"*");
+		Serial.print(WiFi.SSID(i));
+		Serial.print(" (");
+		Serial.print(WiFi.RSSI(i));
+		Serial.println(")");
+		delay(10);
+	}
+	
+	// BME
 	if (!bme.begin())  {
-		Serial.print("No BME280 detected ... Check your wiring or I2C ADDR!\n");
+		//Serial.print("No BME280 detected ... Check your wiring or I2C ADDR!\n");
 	}
 	else {
 		Serial.println("BME280 ready.\n");
