@@ -1,4 +1,4 @@
-update=Sat 08 Apr 2017 06:53:10 PM CEST
+update=Sa 15 Apr 2017 20:35:03 CEST
 version=1
 last_client=kicad
 [pcbnew]
@@ -27,7 +27,7 @@ NetIExt=net
 version=1
 [eeschema]
 version=1
-LibDir=
+LibDir=../../../kicad/libraries/kicad-ESP8266
 [eeschema/libraries]
 LibName1=power
 LibName2=device
@@ -59,3 +59,4 @@ LibName27=atmel
 LibName28=contrib
 LibName29=valves
 LibName30=/home/pge/projekte/ktt/ferienpass/esp/kicad-ESP8266/ESP8266
+LibName31=/home/keroth/kicad/libraries/kicad-ESP8266/ESP8266
