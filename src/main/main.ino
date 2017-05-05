@@ -19,7 +19,6 @@
   #define BME_CS 15;   // Chip Select
 */
 
-<<<<<<< HEAD
 #define SEALEVELPRESSURE_HPA (1013.25)
 #define PIN            D3 // LED PINs
 #define NUMPIXELS      8  // Number of NeoPixels/LEDs
@@ -32,18 +31,11 @@ Adafruit_BME280 bme; // I2C  // D1 = SDA, D2 = SCL
 //Adafruit_BME280 bme(BME_CS,BME_MOSI,BME_MISO,BME_SCK); // Software SPI 
 //Adafruit_BME280 bme(15, 13, 12, 14); // Software SPI 
 //Adafruit_BME280 bme(D1, D2, D3, D4); // Software SPI 
-=======
-Adafruit_BME280 bme; // I2C
-//Adafruit_BME280 bme(BME_CS,BME_MOSI,BME_MISO,BME_SCK); // Software SPI
-//Adafruit_BME280 bme(15, 13, 12, 14); // Software SPI
-int LDR_Pin = A0;
->>>>>>> b8a9f572e6b7f2ea953cbedbd13030b18863694f
 
 int LDR_Pin = A0;
 Sensors sensor(bme);
 
 void setup() {
-<<<<<<< HEAD
 //	pinMode(LED_BUILTIN, OUTPUT);    
 	Serial.begin(9600);
   pixels.begin(); // This initializes the NeoPixel library für LEDs
@@ -57,12 +49,6 @@ void setup() {
     oled.setTextXY(i,0); 
   }
 	delay(20);
-=======
-  pinMode(LED_BUILTIN, OUTPUT);
-  Serial.begin(115200);
-  delay(20);
-  Serial.println("Sensor Test");
->>>>>>> b8a9f572e6b7f2ea953cbedbd13030b18863694f
 }
 
 /*
