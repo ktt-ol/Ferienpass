@@ -1,4 +1,4 @@
-update=Sa 15 Apr 2017 20:35:03 CEST
+update=So 23 Apr 2017 11:49:17 CEST
 version=1
 last_client=kicad
 [pcbnew]
@@ -58,5 +58,4 @@ LibName26=opto
 LibName27=atmel
 LibName28=contrib
 LibName29=valves
-LibName30=/home/pge/projekte/ktt/ferienpass/esp/kicad-ESP8266/ESP8266
-LibName31=/home/keroth/kicad/libraries/kicad-ESP8266/ESP8266
+LibName30=../kicad-ESP8266/ESP8266
