@@ -1,36 +1,23 @@
 #include <Wire.h>
 #include <SPI.h>
 #include <Adafruit_Sensor.h>
-
 #include <Adafruit_BME280.h> // Adafruit_BME280_Library (1.0.5) [modified for I2C!], Adafruit_Unified_Sensor (1.0.2)
 #include "sensors.h"
-#include "display.h"
 #include "ESP8266WiFi.h"
-#include <Adafruit_NeoPixel.h>
+#include <Adafruit_NeoPixel.h> // LEDs
+#include <ACROBOTIC_SSD1306.h> // Display
 
-// Display
-#include <ACROBOTIC_SSD1306.h>
-
-
-/*
-  #define BME_SCK 14;  // Serial Clock (SCK)
-  #define BME_MISO 12; // Serial Data Out (SDO)
-  #define BME_MOSI 13 ;// Serial Data In (SDI)
-  #define BME_CS 15;   // Chip Select
-*/
-
-#define SEALEVELPRESSURE_HPA (1013.25)
+#define SEALEVELPRESSURE_HPA (1013.25) //TODO
 #define PIN            D3 // LED PINs
 #define NUMPIXELS      8  // Number of NeoPixels/LEDs
 #define DISPLAYADDR 0x78
+#define DISPLAYROWS 8
 
 // LEDs
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 
+// BME
 Adafruit_BME280 bme; // I2C  // D1 = SDA, D2 = SCL
-//Adafruit_BME280 bme(BME_CS,BME_MOSI,BME_MISO,BME_SCK); // Software SPI 
-//Adafruit_BME280 bme(15, 13, 12, 14); // Software SPI 
-//Adafruit_BME280 bme(D1, D2, D3, D4); // Software SPI 
 
 int LDR_Pin = A0;
 Sensors sensor(bme);
@@ -42,92 +29,128 @@ void setup() {
   // Display
   oled.init();                      // Initialze SSD1306 OLED display
   oled.clearDisplay();              // Clear screen
+  //oled.drawBitmap(MAINFRAME, 1024); // TODO: 1024px Mainframelogo
   oled.setTextXY(0,0);              // Set cursor position, start of line 0
-  // Test
-  for (int i=0; i<9; i++) {
-    oled.putString((String) i);
-    oled.setTextXY(i,0); 
-  }
 	delay(20);
 }
 
-/*
-void blinkLed() {
-  digitalWrite(LED_BUILTIN, LOW);   // LED on
-  delay(1000);
-  digitalWrite(LED_BUILTIN, HIGH);  // LED off
-  delay(1000);
-}
-*/
+void showBME() {
+    oled.setTextXY(1,0);
+    oled.putString("Temp:  ");
+    oled.putString((String) sensor.getTemperature());
+    oled.putString(" C");
 
-void printValues() {
+    oled.setTextXY(2,0);
+    oled.putString("Druck: ");
+    oled.putString((String) sensor.getPressure());
+    oled.putString(" hPa");
+
+    oled.setTextXY(3,0);
+    oled.putString("Hoehe:");
+    //oled.putString((String) sensor.readAltitude(SEALEVELPRESSURE_HPA));
+    oled.putString(" m");
+
+    oled.setTextXY(4,0);
+    oled.putString("Luftf:  ");
+    oled.putString((String) sensor.getHumidity());
+    oled.putString(" %");
+   
+       
+    // Serial
 		Serial.print("Temperature = ");
 		Serial.print(sensor.getTemperature());
 		Serial.println(" *C");
 
 		Serial.print("Pressure = ");
-
 		Serial.print(sensor.getPressure());
 		Serial.println(" hPa");
 
-		//Serial.print("Approx. Altitude = ");
+		Serial.print("Approx. Altitude = ");
 		//Serial.print(sensor.readAltitude(SEALEVELPRESSURE_HPA));
-		//Serial.println(" m");
+		Serial.println(" m");
 
 		Serial.print("Humidity = ");
 		Serial.print(sensor.getHumidity());
 		Serial.println(" %");
-
-		Serial.println();
+   
+		Serial.println();   
 }
 
 void testLeds() {
   for(int i=0;i<NUMPIXELS;i++) {
-    // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
-    pixels.setPixelColor(i, pixels.Color(0,150,0)); // Moderately bright green color.
+    pixels.setPixelColor(i, pixels.Color(0,150,0)); // RGB
     pixels.show(); // This sends the updated pixel color to the hardware.
-    delay(500); // Delay for a period of time (in milliseconds).
+    delay(500);
   }
   delay(2000);
   for(int i=0;i<NUMPIXELS;i++) {
-    // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
-    pixels.setPixelColor(i, pixels.Color(0,0,0)); // Moderately bright green color.
-    pixels.show(); // This sends the updated pixel color to the hardware.
-    delay(500); // Delay for a period of time (in milliseconds).
+    pixels.setPixelColor(i, pixels.Color(0,0,0)); 
+    pixels.show();
+    delay(500); 
   }
-  delay(2000);
-  
+  delay(2000);  
 }
+
+void clearRow(char row) {
+  for(char column=0; column<16; column++) {
+    oled.setTextXY(row,column); 
+    oled.putString(" ");    
+  }
+}
+ 
+ void clearMultipleRows(char firstRow, char lastRow) {
+  for(char row=firstRow; row<lastRow; row++) {
+    for(char column=0; column<16; column++) {
+      oled.setTextXY(row,column); 
+      oled.putString(" ");    
+    }
+  }
+}
+
+void showWlans() {
+   // WLAN 
+  int n = WiFi.scanNetworks();
+  //oled.clearDisplay();
+  oled.setTextXY(0,0);
+  oled.putString("Found "+ (String)n +" WLANs!\n");
+
+  // Clear WLANs from last scan
+  if(n < DISPLAYROWS-1) {
+    clearMultipleRows(n+1, DISPLAYROWS);
+  }
+  
+  int row = 1;
+  for (int i=0; i<n; ++i) {
+    // More WLANs than display rows  TODO: test
+    if(i > 0 && i % (DISPLAYROWS-1) == 0) { 
+      row  = 1;
+      delay(5000);
+    }
+    clearRow(row);
+    oled.setTextXY(row,0);
+    //oled.putString((String) i + ")");
+    oled.putString((WiFi.encryptionType(i) == ENC_TYPE_NONE)?" ":"*");
+    oled.putString((String) WiFi.SSID(i));
+    oled.putString("\n");    
+    row++;
+    delay(20);    
+  }
+}
+
 void loop() {
-	testLeds();
-
-	// LDR
-	float ldr = sensor.getBrightness(LDR_Pin);
-	Serial.print("LDR-Brightness: "+ (String)ldr +" !\n");
-
-	// WLAN
-	/*
-	int n = WiFi.scanNetworks();
-	Serial.print("Found  "+ (String)n +" WLAN-Networks!\n");
-
-	for (int i = 0; i < n; ++i) {
-		if(i % 5 == 0) { // Displaysize?
-			delay(5000);
-		}
-		Serial.print(i + 1);
-		Serial.print(": ");
-		Serial.print((WiFi.encryptionType(i) == ENC_TYPE_NONE)?" ":"*");
-		Serial.print(WiFi.SSID(i));
-		Serial.print(" (");
-		Serial.print(WiFi.RSSI(i));
-		Serial.println(")");
-		delay(10);
-	}
-	*/
-	// BME
-		
-	printValues();    
-	delay(1000);
-	 
-        
+  // LDR
+  float ldr = sensor.getBrightness(LDR_Pin);
+  Serial.print("LDR-Brightness: "+ (String)ldr +" !\n");
+  
+  int mode = 2; // TODO: Switch via button
+  switch(mode) {
+    case 1:
+      showWlans();
+    case 2:
+      showBME(); 
+    default:
+      showBME(); 
+  }
+	//testLeds();    
+	delay(2000);        
 }
