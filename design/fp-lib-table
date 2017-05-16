@@ -1,0 +1,4 @@
+(fp_lib_table
+  (lib (name ESP8266)(type KiCad)(uri /home/domse/Projects/Space/Ferienpass/kicad-ESP8266/ESP8266.pretty)(options "")(descr ""))
+  (lib (name Ferienpass)(type KiCad)(uri /home/domse/Projects/Space/Ferienpass)(options "")(descr ""))
+)
