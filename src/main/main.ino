@@ -7,7 +7,7 @@
 #include <Adafruit_NeoPixel.h> // LEDs
 #include <ACROBOTIC_SSD1306.h> // Display
 
-#define BUTTONPIN      9  // SD2
+#define BUTTONPIN      D4
 #define LEDPIN         D3 
 #define BEEPPIN        10 // SD3
 #define NUMPIXELS      8  // Number of NeoPixels/LEDs
@@ -20,26 +20,23 @@ Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, LEDPIN, NEO_GRB + NEO_KH
 // BME
 Adafruit_BME280 bme; // I2C  // D1 = SDA, D2 = SCL
 
-int LDR_Pin = A0;
+//int LDR_Pin = A0;
 int buttonState = 0;
-int mode = 1;
+int mode = 0;
 Sensors sensor(bme);
 
 // Values for microphone
 const int THRESHOLD = 20;
 const int VAL_MEAN = 507;
-
 // trigger characteristics
 const int CLAPS_TO_TRIGGER = 2; // number of claps
 const int DEBOUNCE_TIME = 150; // ms to ignore double-clapping
 const int SILENCE_T = 40; // ms between claps, otherwise reset
 const int MELODY_INTERVAL = 800; // ms max time for the claps
 const int PAUSE_TIME = 2000; // wait after switch, or noise
-
 // pin-layout
 const int analogPin = 0;
 //const int OUTPUT_PIN = 13;    
-
 int output_state = LOW;
 uint32_t pause_t = 0;
 uint32_t debounce_t = 0;
@@ -59,14 +56,21 @@ void setup() {
   //oled.drawBitmap(MAINFRAME, 1024); // TODO: 1024px Mainframelogo
   oled.setTextXY(0,0); 
        
-  pinMode(BUTTONPIN, INPUT_PULLUP);        
+  pinMode(BUTTONPIN, INPUT);        
   pinMode(LEDPIN, OUTPUT);  
   pinMode(BEEPPIN, OUTPUT);  
 
-  //attachInterrupt(digitalPinToInterrupt(BUTTONPIN), beep(2, 128), CHANGE); //TODO!
+  attachInterrupt(digitalPinToInterrupt(BUTTONPIN), isr, FALLING);
   
   beep(1, 128);
 	delay(20);
+}
+
+void isr() {
+  //beep(4, 128);
+  Serial.println("INTERURPT!");
+  oled.clearDisplay();
+  mode = ++mode % 3;
 }
 
 void showBME() {
@@ -109,15 +113,14 @@ void testLeds() {
   for(int i=0;i<NUMPIXELS;i++) {
     pixels.setPixelColor(i, pixels.Color(0,150,0)); // RGB
     pixels.show(); // This sends the updated pixel color to the hardware.
-    delay(500);
+    delay(100);
   }
-  delay(2000);
+  delay(500);
   for(int i=0;i<NUMPIXELS;i++) {
     pixels.setPixelColor(i, pixels.Color(0,0,0)); 
     pixels.show();
-    delay(500); 
+    delay(100); 
   }
-  delay(2000);  
 }
 
 void beep(int count, int frequency) {
@@ -156,6 +159,10 @@ void showWlans() {
   
   int row = 1;
   for (int i=0; i<n; ++i) {
+    if(mode != 1){
+      oled.clearDisplay(); 
+      break;
+    }
     //oled.clearDisplay();
     oled.setTextXY(0,0);
     oled.putString("Found "+ (String)n +" WLANs!");
@@ -233,22 +240,14 @@ void startMic() {
 }
 
 void loop() {
-  /* LDR  
+  /* LDR  for next release
   float ldr = sensor.getBrightness(LDR_Pin);
   Serial.print("LDR-Brightness: "+ (String)ldr +" !\n");
   */
-  buttonState = digitalRead(BUTTONPIN); // TODO: Interrupt
-  /*
-  if(buttonState) {
-    mode++ % 2;
-    oled.clearDisplay();
-  }
   
-  oled.setTextXY(0,0);
-  oled.putString("Button: "+(String)buttonState); 
-  oled.setTextXY(1,0);
-  oled.putString("Mode: "+(String)mode);
-  */
+  Serial.println("Buttonstate: " + (String)buttonState);
+  Serial.println("Mode: " + (String)mode);
+
   
   switch(mode) {
     case 0:
@@ -267,5 +266,5 @@ void loop() {
   
   //beep(4, 128);
 	//testLeds();    
-	delay(10);        
+	delay(500);        
 }
