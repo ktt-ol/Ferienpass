@@ -63,7 +63,7 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(BUTTONPIN), isr, FALLING);
   
   beep(1, 128);
-	delay(20);
+  delay(20);
 }
 
 void isr() {
@@ -71,6 +71,23 @@ void isr() {
   Serial.println("INTERURPT!");
   oled.clearDisplay();
   mode = ++mode % 3;
+}
+
+void testLeds() {
+  for(int i=0;i<NUMPIXELS;i++) {
+    // Helligkeit
+    pixels.setPixelColor(i, pixels.Color(150,0,0)); // RGB
+    pixels.setBrightness(10);
+    pixels.show(); // This sends the updated pixel color to the hardware.
+    delay(100);
+  }
+  delay(500);
+  for(int i=0;i<NUMPIXELS;i++) {
+    pixels.setPixelColor(i, pixels.Color(0,0,150)); 
+    pixels.setBrightness(10);
+    pixels.show();
+    delay(100); 
+  }
 }
 
 void showBME() {
@@ -107,20 +124,6 @@ void showBME() {
 		Serial.println(" %");
    
 		Serial.println();   
-}
-
-void testLeds() {
-  for(int i=0;i<NUMPIXELS;i++) {
-    pixels.setPixelColor(i, pixels.Color(0,150,0)); // RGB
-    pixels.show(); // This sends the updated pixel color to the hardware.
-    delay(100);
-  }
-  delay(500);
-  for(int i=0;i<NUMPIXELS;i++) {
-    pixels.setPixelColor(i, pixels.Color(0,0,0)); 
-    pixels.show();
-    delay(100); 
-  }
 }
 
 void beep(int count, int frequency) {
@@ -251,7 +254,8 @@ void loop() {
   
   switch(mode) {
     case 0:
-      showBME();       
+      showBME();  
+      testLeds();       
       break;
     case 1:      
       showWlans();
