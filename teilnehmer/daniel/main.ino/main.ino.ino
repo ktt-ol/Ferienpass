@@ -74,6 +74,15 @@ void isr() {
   mode = ++mode % 3;
 }
 
+void bunteLEDs() {
+  for(int i=0;i<25;i++) {
+    pixels.setPixelColor(i, pixels.Color(random(10, 255),random(10, 255),random(10, 255)));        
+    pixels.setBrightness(10); // Helligkeit
+    pixels.show(); // This sends the updated pixel color to the hardware.
+    delay(100);
+  } 
+}
+
 void testLeds() {
   pixels.setPixelColor(24, pixels.Color(255,0,0)); // Rot
   for(int i=0;i<3;i++) {
@@ -107,6 +116,24 @@ void testLeds() {
     pixels.show();
     delay(50); 
   }
+}
+
+void roteMixedLEDs() {
+  for(int i=0;i<25;i++) {
+    pixels.setPixelColor(i, pixels.Color(255,i*5,i*5));  // Rotverlauf        
+    pixels.setBrightness(10); // Helligkeit
+    pixels.show(); // This sends the updated pixel color to the hardware.
+    delay(100);
+  } 
+}
+
+void blaueMixedLEDs() {
+  for(int i=0;i<25;i++) {
+    pixels.setPixelColor(i, pixels.Color(i*5,i*5,255));  // Blauverlauf        
+    pixels.setBrightness(10); // Helligkeit
+    pixels.show(); // This sends the updated pixel color to the hardware.
+    delay(100);
+  } 
 }
 
 void showBME() {
@@ -273,19 +300,24 @@ void loop() {
   
   switch(mode) {
     case 0:
+      testLeds();
+      //blaueMixedLEDs();
       showBME();           
       break;
-    case 1:      
+    case 1:  
+      bunteLEDs();
       showWlans();
       break;
     case 2:
+      roteMixedLEDs();
       startMic();
       break;
     default:
+      testLeds();
       showBME(); 
       break;
   }
-   testLeds(); 
+   
   //beep(4, 128);
 	
 	delay(500);        
