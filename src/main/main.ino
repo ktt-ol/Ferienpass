@@ -10,7 +10,7 @@
 #define BUTTONPIN      D4
 #define LEDPIN         D3 
 #define BEEPPIN        10 // SD3
-#define NUMPIXELS      8  // Number of NeoPixels/LEDs
+#define NUMPIXELS      25  // Number of NeoPixels/LEDs
 #define DISPLAYADDR 0x78
 #define DISPLAYROWS 8
 
@@ -48,6 +48,7 @@ int amp = 0;
 
 void setup() {
 	Serial.begin(9600);
+  Serial.println("Starting ESP...");
   pixels.begin(); // This initializes the NeoPixel library für LEDs
   
   // Display
@@ -76,14 +77,14 @@ void isr() {
 void testLeds() {
   for(int i=0;i<NUMPIXELS;i++) {
     // Helligkeit
-    pixels.setPixelColor(i, pixels.Color(150,0,0)); // RGB
+    pixels.setPixelColor(i, pixels.Color(0,0,150)); // RGB
     pixels.setBrightness(10);
     pixels.show(); // This sends the updated pixel color to the hardware.
     delay(100);
   }
   delay(500);
   for(int i=0;i<NUMPIXELS;i++) {
-    pixels.setPixelColor(i, pixels.Color(0,0,150)); 
+    pixels.setPixelColor(i, pixels.Color(0,0,0)); 
     pixels.setBrightness(10);
     pixels.show();
     delay(100); 
@@ -269,6 +270,6 @@ void loop() {
   }
   
   //beep(4, 128);
-	//testLeds();    
+	
 	delay(500);        
 }
