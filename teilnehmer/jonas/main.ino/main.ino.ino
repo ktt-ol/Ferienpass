@@ -74,39 +74,101 @@ void isr() {
   mode = ++mode % 3;
 }
 
-void testLeds() {
-  pixels.setPixelColor(24, pixels.Color(255,0,0)); // Rot
-  for(int i=0;i<3;i++) {
-    pixels.setPixelColor(i, pixels.Color(225,45,45));  // Rot
-    delay(50);
-  }
-  pixels.setPixelColor(3, pixels.Color(75,75,255));  // Blau
-  delay(50);
-  pixels.setPixelColor(4, pixels.Color(225,45,45));  // Rot
-  delay(50);
-  pixels.setPixelColor(5, pixels.Color(225,45,45));  // Rot
-  delay(50);
-  pixels.setPixelColor(6, pixels.Color(75,75,255));  // Blau
-  delay(50);
-  pixels.setPixelColor(7, pixels.Color(225,45,45));  // Rot
-  delay(50);
-  for(int i=8;i<16;i++) {
-    pixels.setPixelColor(i, pixels.Color(200,250,10)); // Gruen
-    delay(50);
-  }
-  for(int i=16;i<24;i++) {
-    pixels.setPixelColor(i, pixels.Color(75,75,255));  // Blau        
+void bunteLEDsLong() {
+  for(int i=0;i<25;i++) {
+    pixels.setPixelColor(i, pixels.Color(random(10, 255),random(10, 255),random(10, 255)));        
     pixels.setBrightness(10); // Helligkeit
     pixels.show(); // This sends the updated pixel color to the hardware.
-    delay(50);
-  }
-  delay(10000);
-  for(int i=0;i<NUMPIXELS;i++) {
-    pixels.setPixelColor(i, pixels.Color(0,0,0)); 
+    delay(75);
+   } 
+   delay(100);
+   for(int i=0;i<25;i++) {
+    pixels.setPixelColor(i, pixels.Color(0,0,0));        
+    pixels.setBrightness(10); // Helligkeit
+    pixels.show(); // This sends the updated pixel color to the hardware.
+    delay(75);
+  } 
+}
+
+void blankLEDs() {
+   for(int i=0;i<25;i++) {
+    pixels.setPixelColor(i, pixels.Color(0,0,0));        
     pixels.setBrightness(10);
-    pixels.show();
-    delay(50); 
+    pixels.show(); 
+    delay(20);  
+   }
+}
+
+void rotGruenLEDs() {
+  for(int i=0;i<8;i++) {
+    pixels.setPixelColor(i, pixels.Color(255,0,0));        
+    pixels.setBrightness(10); // Helligkeit
+    pixels.show(); // This sends the updated pixel color to the hardware.
+    delay(75);
+   } 
+   for(int i=8;i<16;i++) {
+    pixels.setPixelColor(i, pixels.Color(0,255,0));        
+    pixels.setBrightness(10); 
+    pixels.show(); 
+    delay(75);
+   }
+   for(int i=16;i<24;i++) {
+    pixels.setPixelColor(i, pixels.Color(255,0,0));        
+    pixels.setBrightness(10); 
+    pixels.show(); 
+    delay(75);
+  } 
+  pixels.setPixelColor(24, pixels.Color(0,255,0)); 
+  pixels.setBrightness(10); 
+  pixels.show(); 
+}
+
+void orangeLEDs(int startLed, int endLed) {
+  blankLEDs();
+  for(int i=startLed;i<=endLed;i++) {
+    pixels.setPixelColor(i, pixels.Color(255,80,0));        
+    pixels.setBrightness(10); // Helligkeit
+    pixels.show(); // This sends the updated pixel color to the hardware.
+    delay(75);
+   }   
+}
+
+void blaueLEDs(int startLed, int endLed) {
+  blankLEDs();
+  for(int i=startLed;i<=endLed;i++) {
+    pixels.setPixelColor(i, pixels.Color(0,0,255));        
+    pixels.setBrightness(10); 
+    pixels.show(); 
+    delay(75);
+   }   
+}
+
+void bunteLEDs() {
+  for(int i=0;i<25;i++) {
+    pixels.setPixelColor(i, pixels.Color(random(10, 255),random(10, 255),random(10, 255)));        
+    pixels.setBrightness(10); // Helligkeit
+    pixels.show(); // This sends the updated pixel color to the hardware.
+    delay(75);
   }
+}
+
+void ampLEDs(int amp)  {
+  amp = amp / 20;
+  if(amp > 255) {
+    amp = 255;
+  }
+  for(int i=0;i<amp;i++) {
+    pixels.setPixelColor(i, pixels.Color(255,255,0));        
+    pixels.setBrightness(10); // Helligkeit
+    pixels.show(); // This sends the updated pixel color to the hardware.
+    delay(10);
+  } 
+    for(int i=amp;i<NUMPIXELS;i++) {
+    pixels.setPixelColor(i, pixels.Color(0,0,0));        
+    pixels.setBrightness(10); // Helligkeit
+    pixels.show(); // This sends the updated pixel color to the hardware.
+    delay(10);
+  } 
 }
 
 void showBME() {
@@ -127,6 +189,12 @@ void showBME() {
     oled.putString("H: ");
     oled.putString((String) sensor.getHumidity());
     oled.putString(" %");
+
+    oled.setTextXY(5,0);
+    oled.putString("");
+
+    oled.setTextXY(6,0);
+    oled.putString("Jonas Sensor");
    
        
     // Serial
@@ -217,6 +285,7 @@ void micReset() {
 void startMic() {
   sensorVal = analogRead(analogPin);
   amp = abs(sensorVal-VAL_MEAN);
+  ampLEDs(amp);
 
   // Serial.print(F("sensed: ")); Serial.println(sensorVal);
   // Serial.print(F("amp: ")); Serial.println(amp);
@@ -274,18 +343,26 @@ void loop() {
   switch(mode) {
     case 0:
       showBME();           
+      orangeLEDs(0, 7);
+      blaueLEDs(8, 24);
       break;
-    case 1:      
+    case 1:
+      blaueLEDs(0, 7); 
+      orangeLEDs(8, 15);
+      blaueLEDs(16, 24);
       showWlans();
       break;
     case 2:
+      orangeLEDs(24, 24);
       startMic();
       break;
     default:
       showBME(); 
+      orangeLEDs(0, 7);
+      blaueLEDs(8, 24);
       break;
   }
-   testLeds(); 
+   
   //beep(4, 128);
 	
 	delay(500);        
